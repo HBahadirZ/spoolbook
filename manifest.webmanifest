@@ -1,0 +1,35 @@
+{
+  "id": "./",
+  "name": "Spoolbook: 3D Print Cost Calculator",
+  "short_name": "Spoolbook",
+  "description": "Read filament and print time from sliced files, work out what each 3D print really costs, price it, and track your spools.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#F2F3F7",
+  "theme_color": "#1E2140",
+  "orientation": "any",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    { "src": "icons/icon-48.png", "sizes": "48x48", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "screenshots": [
+    { "src": "store-assets/screenshot-1-quote.png", "sizes": "1920x1080", "type": "image/png", "form_factor": "wide", "label": "Cost breakdown and price per piece" },
+    { "src": "store-assets/screenshot-2-spools.png", "sizes": "1920x1080", "type": "image/png", "form_factor": "wide", "label": "Spool inventory" },
+    { "src": "store-assets/screenshot-4-dark.png", "sizes": "1920x1080", "type": "image/png", "form_factor": "wide", "label": "Follows Windows dark mode" }
+  ],
+  "file_handlers": [
+    { "action": "./", "accept": { "text/x-gcode": [".gcode", ".gco"], "model/3mf": [".3mf"] } }
+  ],
+  "launch_handler": { "client_mode": "focus-existing" },
+  "shortcuts": [
+    { "name": "New quote", "short_name": "New", "url": "./?action=new", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

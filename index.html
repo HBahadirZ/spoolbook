@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Spoolbook</title>
+  <meta name="description" content="3D print cost calculator: read filament and time from sliced files, price prints, track spools.">
+  <meta name="theme-color" content="#1E2140">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="preload" href="fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-view="quote">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="appbar">
+    <div class="appbar-inner">
+      <div class="brand"><img src="icons/icon.svg" alt="" width="28" height="28"><span>Spoolbook</span></div>
+      <nav class="tabs" aria-label="Sections">
+        <button data-action="view" data-view="quote">Quotes</button>
+        <button data-action="view" data-view="spools">Spools</button>
+        <button data-action="view" data-view="printers">Printers</button>
+      </nav>
+      <span class="spacer"></span>
+      <label class="sr-only" for="jobSelect">Open quote</label>
+      <select id="jobSelect" class="job-select"></select>
+      <button id="newJobBtn" class="btn bar" data-action="new-job"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg><span>New quote</span></button>
+      <span id="proBadge" class="pro-badge" hidden>Pro</span>
+      <button id="getPro" class="btn bar gold" data-action="open-pro">Get Pro</button>
+      <button class="icon-btn bar" data-action="open-settings" aria-label="Settings">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5.5h8M15 5.5h2M3 10h2M9 10h8M3 14.5h6M13 14.5h4"/><circle cx="13" cy="5.5" r="2"/><circle cx="7" cy="10" r="2"/><circle cx="11" cy="14.5" r="2"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main id="main" class="main" tabindex="-1"></main>
+    <aside id="side" class="side" aria-label="Price"></aside>
+  </div>
+
+  <div class="drop-hint" aria-hidden="true"><p>Drop a .gcode or .gcode.3mf file to read its filament and print time</p></div>
+
+  <dialog id="settingsDialog" aria-labelledby="settingsTitle">
+    <form id="settingsForm" method="dialog">
+      <h2 id="settingsTitle">Settings</h2>
+      <div class="grid">
+        <label class="field"><span class="label">Currency</span>
+          <select id="set-currency">
+            <option value="USD">US dollar</option><option value="CAD">Canadian dollar</option><option value="GBP">British pound</option><option value="EUR">Euro</option>
+            <option value="AUD">Australian dollar</option><option value="NZD">New Zealand dollar</option><option value="TRY">Turkish lira</option><option value="INR">Indian rupee</option>
+            <option value="MXN">Mexican peso</option><option value="JPY">Japanese yen</option>
+          </select></label>
+        <label class="field"><span class="label">Electricity price</span><span class="control"><input id="set-electricityRate" inputmode="decimal"><span class="suffix">per kWh</span></span><span class="hint">On your power bill.</span></label>
+        <label class="field"><span class="label">Your labour rate</span><span class="control"><input id="set-laborRate" inputmode="decimal"><span class="suffix">per hour</span></span></label>
+        <label class="field"><span class="label">Sales tax</span><span class="control"><input id="set-taxPct" inputmode="decimal"><span class="suffix">%</span></span></label>
+        <label class="field"><span class="label">Default failed print allowance</span><span class="control"><input id="set-defaultFailurePct" inputmode="decimal"><span class="suffix">%</span></span></label>
+        <label class="field"><span class="label">Default markup</span><span class="control"><input id="set-defaultMarkupPct" inputmode="decimal"><span class="suffix">%</span></span></label>
+        <label class="field"><span class="label">Round prices up to</span>
+          <select id="set-roundTo"><option value="">Don't round</option><option value="0.05">0.05</option><option value="0.25">0.25</option><option value="0.5">0.50</option><option value="1">1</option><option value="5">5</option></select></label>
+      </div>
+      <h3>Marketplace fees</h3>
+      <p class="block-note" id="feeNote">Profit after fees is part of Pro.</p>
+      <div class="grid">
+        <label class="field"><span class="label">Fee per sale</span><span class="control"><input id="set-feePct" inputmode="decimal"><span class="suffix">%</span></span><span class="hint">Marketplace and payment fees combined. Check your platform's current rates.</span></label>
+        <label class="field"><span class="label">Fixed fee per order</span><span class="control"><input id="set-feeFixed" inputmode="decimal"></span><span class="hint">Listing or transaction fee.</span></label>
+      </div>
+      <h3>Your business</h3>
+      <p class="block-note" id="bizNote">Your business details appear on printed quotes with Pro.</p>
+      <div class="grid">
+        <label class="field wide"><span class="label">Business name</span><span class="control"><input id="setBiz-name" autocomplete="organization"></span></label>
+        <label class="field"><span class="label">Phone</span><span class="control"><input id="setBiz-phone" autocomplete="tel" inputmode="tel"></span></label>
+        <label class="field"><span class="label">Email</span><span class="control"><input id="setBiz-email" autocomplete="email" inputmode="email"></span></label>
+        <label class="field wide"><span class="label">Website or shop link</span><span class="control"><input id="setBiz-website" autocomplete="url" inputmode="url"></span></label>
+      </div>
+      <p class="fine">Everything is saved on this PC only. Spoolbook does not collect or send your data. <a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a></p>
+      <div class="dialog-actions">
+        <button type="button" class="btn" data-action="close-dialog">Cancel</button>
+        <button type="submit" class="btn primary">Save settings</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="proDialog" aria-labelledby="proTitle">
+    <div class="pro-dialog">
+      <div class="plate" aria-hidden="true"></div>
+      <h2 id="proTitle">Spoolbook Pro</h2>
+      <p id="proReason" class="pro-reason" hidden></p>
+      <ul class="pro-list">
+        <li>Profit and margin after marketplace fees</li>
+        <li>Unlimited printers, spools and saved quotes</li>
+        <li>Your business name and contact details on quotes</li>
+        <li>CSV export for spreadsheets and bookkeeping</li>
+      </ul>
+      <p class="pro-price"><span id="proPrice">$4.99</span> once. No subscription.</p>
+      <p id="proOwned" class="pro-owned" hidden>Pro is unlocked on this Microsoft account.</p>
+      <p id="proStoreNote" class="block-note" hidden>Pro is sold through the Microsoft Store version of Spoolbook.
+        <a id="proStoreLink" href="#" target="_blank" rel="noopener">Get Spoolbook from the Microsoft Store</a></p>
+      <div class="dialog-actions">
+        <button type="button" class="btn" data-action="close-dialog">Not now</button>
+        <button type="button" id="restorePro" class="btn" data-action="restore-pro">Restore purchase</button>
+        <button type="button" id="buyPro" class="btn primary" data-action="buy-pro">Get Pro</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="printArea" class="print-area"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
